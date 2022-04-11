@@ -1,3 +1,4 @@
+This code is a debugged version of the code provided by "Zhenghao Zhao" at this link.: https://github.com/zzh142857/SiameseFC-tf
 # SiamFC-tf
 This repository is the tensorflow implementation of both training and evaluation of SiamFC described in the paper [*Fully-Convolutional Siamese nets for object tracking*](https://www.robots.ox.ac.uk/~luca/siamese-fc.html).   
 The code is revised on the base of the evaluation-only version code from the repository of the auther of this paper(https://github.com/torrvision/siamfc-tf).
@@ -8,12 +9,12 @@ Step by step explanation of the whole model and training process.
 ### 2.1 Prepare training data
 One training sample consists of an examplar image: **z**, a search image : **x**, and their correspnding ground truth information: **z_pos_x, z_pos_y, z_target_w, z_target_h and x_pos_x, x_pos_y, x_target_w, x_target_h**. Note the coordinates of the target have been converted to the center of bbox from the lefttop corner through function *src.region_to_bbox.py*. <br>
 <br>
-We pick the neibored two images in a vedio as z and x, and get a shuffled training data set from all 78 vedios in OTB2015 data set. And for conveniece of later steps, we resize all images to a uniform size [*design.resize_width, design.resize_height*]. The training data set is saved in a tfrecord file.
+We pick the neibored two images in a vedio as z and x, and get a shuffled training data set from all 180 vedios in validation data from GOT-10K data set. And for conveniece of later steps, we resize all images to a uniform size [*design.resize_width, design.resize_height*]. The training data set is saved in a tfrecord file.
 
 ### 2.2 Pad & Crop the image
 Before entering the conv network, we crop **z** and **x** to certain sizes, and pad with the mean RGB value of each image if the crop region exceeds the orignal image size.<br>
 <br>
-According to the paper, the croped **z** should contains the area of the marginal bbox on the original image, where the margin *p = (w + h) / 4*, and this marginal context will then be resized to a constant size: [*design.exemplar_sz, design.exemplar_sz*], which is [127, 127] in our training process. <br>
+According to the paper, the croped **z** should contains the area of the marginal bbox on the original image, where the margin *2p = (w + h) / 2*, and this marginal context will then be resized to a constant size: [*design.exemplar_sz, design.exemplar_sz*], which is [127, 127] in our training process. <br>
 <br>
 Cropping step of **x** is the same, but only all the sizes are larger by a facter: *desing.search_sz / desing_examplar_sz* and the center of cropping is the center of target position in **x** instead of **z**. In addition, cause the evaluation process needs to inference three different scales of **x** to implement the update on target scale, here in training process, we also crop three **x** samples, but with the same size. (The last sample actually has a little bit larger size due to the way we crop the image, but this doesn't matter.)
 
@@ -72,8 +73,8 @@ Get the index of the highest score on the map, and recover the displacement on t
 4) Download training data   
 cd to the directory where this README.md file located, then:
 `mkdir data`   
-Download [video sequences](https://drive.google.com/file/d/0B7Awq_aAemXQSnhBVW5LNmNvUU0/view) in `data` and unzip the archive.
-The original model on the paper is trained with the ImageNet(ILSVRC15) dataset, which has millions of labeled images. For simplicity, we only use OTB15 for training and VOT for validation. The training data contains 78 vedios, which total thirty thousand images.
+Download [video sequences](http://got-10k.aitestunion.com/downloads_dataset/val_data) in `data` and unzip the archive.
+The original model on the paper is trained with the ImageNet(ILSVRC15) dataset, which has millions of labeled images. For simplicity, we only use GOT-10K Validation data set for training and OTB100 for validation. The training data contains 180 vedios, which total around 20000 thousand images.
 5) Prepare tfrecord file for training data   
 To reduce the time for reading images during training, we write all the training data into a single tfrecord file.   
 Execute `python3 get_shuffled_list_from_vedio.py` to generate a shuffled list of information of all examplar search imge pairs for training.   
