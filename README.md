@@ -70,9 +70,7 @@ Get the index of the highest score on the map, and recover the displacement on t
 2) The code is prepared for a environment with Python==3.6 and Tensorflow-gpu==1.6 with the required CUDA and CudNN library.   
 3) Other packages can be installed by:   
 `sudo pip install -r requirements.txt`   
-4) Download training data   
-cd to the directory where this README.md file located, then:
-`mkdir data`   
+4) Download training data cd to the directory where this README.md file located, then: mkdir data`   
 Download [video sequences](http://got-10k.aitestunion.com/downloads_dataset/val_data) in `data` and unzip the archive.
 The original model on the paper is trained with the ImageNet(ILSVRC15) dataset, which has millions of labeled images. For simplicity, we only use GOT-10K Validation data set for training and OTB100 for validation. The training data contains 180 vedios, which total around 20000 thousand images.
 5) Prepare tfrecord file for training data   
